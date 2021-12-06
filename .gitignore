@@ -112,3 +112,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# large datasets
+*.npz
+real_experiment/fMRI_connectivity/UMCD_dataset
