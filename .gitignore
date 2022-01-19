@@ -116,3 +116,10 @@ dmypy.json
 # large datasets
 *.npz
 real_experiment/fMRI_connectivity/UMCD_dataset
+.DS_Store
+.DS_Store
+synthetic_experiment/.DS_Store
+.DS_Store
+.DS_Store
+.DS_Store
+synthetic_experiment/.DS_Store

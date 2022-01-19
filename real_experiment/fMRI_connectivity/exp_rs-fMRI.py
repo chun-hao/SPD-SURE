@@ -1,15 +1,13 @@
+import sys
+sys.path.insert(1, '../../')
 from SPD_SURE_pytorch import *
 import numpy as np
-from numpy.random import uniform, normal, multivariate_normal
-from pymanopt.manifolds import Product, Euclidean, SymmetricPositiveDefinite
 import pandas as pd
 from timeit import default_timer as timer
-from scipy.stats import invwishart
 import multiprocessing
 from joblib import Parallel, delayed
 import pickle
 from plotnine import *
-from plotnine.data import mpg
 import scipy.linalg as sla
 from datetime import datetime
 
@@ -29,7 +27,8 @@ def check_SPD(X):
             
     return res
 
-def exp_rs_fMRI(n, N, mat, M, Sigma, ran_seed = 0, verbose = False):
+def exp_rs_fMRI(n, N, M, Sigma, ran_seed = 0, verbose = False):
+    mat = np.load('connectivity_matrix.npz')
     names = ['TD', 'ADHD_C', 'ADHD_I', 'H', 'P', 'CON', 'PSP']
     #N = 10 # number of regions/nodes 
     p = len(names)
@@ -58,7 +57,7 @@ def exp_rs_fMRI(n, N, mat, M, Sigma, ran_seed = 0, verbose = False):
     S_eigval = np.linalg.eigh(S_logE)[0]
 
     ## SURE (mean only)
-    lam_hat, mu_hat, M_SURE = SURE_const(M_logE, np.mean(S_eigval, axis = 1)/(n*(n-1)))
+    lam_hat, mu_hat, M_SURE = SURE_const(M_logE, np.mean(S_eigval, axis = 1)/(n*(n-1)), verbose = verbose)
     
     ## SURE (mean and covariance)
     lam_hat, mu_hat, nu_hat, Psi_hat, M_SURE_full, Sig_SURE_full = SURE_full(M_logE, S_logE, n, verbose = verbose)
@@ -81,7 +80,7 @@ if __name__ == '__main__':
     names = np.array(['TD', 'ADHD_C', 'ADHD_I', 'H', 'P', 'CON', 'PSP'])
     
     n = 5
-    m = 1000 # repetition
+    m = 100 # repetition
     N_vec = np.array([3, 5, 7, 10])
     ran_seed = 12345
     
@@ -97,6 +96,7 @@ if __name__ == '__main__':
     risk_Sig = risk_M.copy()
     risk_Sig_sd = risk_M.copy()
     r_ind = 0
+    
     
     for N in N_vec:
         #Compute the papulation mean/cov
@@ -123,9 +123,12 @@ if __name__ == '__main__':
         
         ###############################################################
         print('N = ', N)
-        results = np.zeros((m, 3, 2))
-        for i in range(m):
-            results[i] = exp_rs_fMRI(n, N, mat, M, Sigma, ran_seed + i)
+        #results = np.zeros((m, 3, 2))
+        #for i in range(m):
+        #    results[i] = exp_rs_fMRI(n, N, mat, M, Sigma, ran_seed + i)
+        num_cores = -1
+
+        results = Parallel(n_jobs=num_cores)(delayed(exp_rs_fMRI)(n, N, M, Sigma, ran_seed + i) for i in range(m))
             
         res = np.mean(np.array(results), axis = 0)
         res_sd = np.std(np.array(results), axis = 0)/np.sqrt(m)
