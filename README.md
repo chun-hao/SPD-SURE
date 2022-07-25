@@ -2,4 +2,4 @@
  
 Required:
 autograd
-pymanopt > 0.2.5
+pymanopt > 2.0.0

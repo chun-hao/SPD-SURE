@@ -21,7 +21,7 @@ def loss_GL(X, theta):
     
     return l/n
 
-def SURE_const(X, A, verbose = True):
+def SURE_const(X, A, verbose = False):
     p, N = X.shape[0:2]
     assert (p == A.shape[0]), "The lengths of X and A should be the same."
     

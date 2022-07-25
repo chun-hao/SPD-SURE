@@ -1,6 +1,6 @@
-from pymanopt.manifolds import Product, Euclidean, PositiveDefinite
+from pymanopt.manifolds import Product, Euclidean, SymmetricPositiveDefinite
 from pymanopt import Problem
-from pymanopt.solvers import SteepestDescent
+from pymanopt.optimizers import SteepestDescent
 from numpy.random import uniform, normal, multivariate_normal
 import numpy as np
 from scipy.optimize import minimize
@@ -12,7 +12,7 @@ def vec(X):
     if X.ndim == 2:
         X = np.array([X])
     n, d = X.shape[0:2]
-    SPD = PositiveDefinite(d)
+    SPD = SymmetricPositiveDefinite(d)
     tri_ind = np.triu_indices(d, 1)
     I = np.array([np.eye(d) for i in range(n)])
     tmp = SPD.log(I, X)
@@ -24,7 +24,7 @@ def vec_inv(x, d):
     if x.ndim == 1:
         x = np.array([x])
     n = x.shape[0]
-    SPD = PositiveDefinite(d, n)
+    SPD = SymmetricPositiveDefinite(d, k = n)
     tri_ind = np.triu_indices(d, 1)
     logX = np.zeros((n, d, d))
     for i in range(n):
@@ -59,7 +59,7 @@ def dist_GL(X, Y):
 def FM_logE(X):
     n, d = X.shape[0:2]
     s = np.zeros((d, d))
-    SPD = PositiveDefinite(d)
+    SPD = SymmetricPositiveDefinite(d)
     I = np.array([np.eye(d) for i in range(n)])
     logX = SPD.log(I, X)
     return SPD.exp(I[0], np.mean(logX, axis = 0))
@@ -81,14 +81,14 @@ def cov_logE(X):
 def FM_GL_rec(X):
     n, d = X.shape[0:2]
     S = X[0]
-    SPD = PositiveDefinite(d)
+    SPD = SymmetricPositiveDefinite(d)
     for i in range(1, n):
         S = SPD.exp(S, (1/(i+1))*SPD.log(S, X[i]))
     return S
 
 def FM_GL(X):
     n, d = X.shape[0:2]
-    man = PositiveDefinite(d)
+    man = SymmetricPositiveDefinite(d)
     def objective(y):  # weighted Frechet variance
         acc = 0
         for i in range(n):
