@@ -118,4 +118,5 @@ dmypy.json
 real_experiment/fMRI_connectivity/UMCD_dataset
 *.DS_Store
 *.sh
-output/*.p
+*.p
+*.mat
