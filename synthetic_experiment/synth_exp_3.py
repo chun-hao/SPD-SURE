@@ -6,7 +6,7 @@ n = 5
 p = 10
 lam_vec = np.array([10, 50])
 nu_vec = np.array([10, 25])
-N_vec = np.array([10, 20, 30, 50, 75, 100])
+N_vec = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 ran_seed = 12345
 m = 1000 # number of replications
 
@@ -24,7 +24,7 @@ for N in N_vec:
     for nu in nu_vec:
         for lam in lam_vec:
             print('N =', N, ', nu =', nu, ', lam =', lam)
-            results = Parallel(n_jobs=num_cores)(delayed(exp_lognormal)(n + q, p, lam, mu, q + nu, Psi, ran_seed + i) \
+            results = Parallel(n_jobs=num_cores)(delayed(exp_lognormal)(n, p, lam, mu, q + nu, Psi, ran_seed + i) \
                                                  for i in range(m))
             res = np.mean(np.array(results), axis = 0)
             res = pd.DataFrame(res, index = ['FM_logE', 
